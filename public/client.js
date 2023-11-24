@@ -84,6 +84,7 @@ connection.onmessage = (message) => {
 };
 
 function setScoreboard() {
+  console.log(players);
   const scoreboard = document.querySelector("#scoreboard");
 
   scoreboard.innerHTML = "<p></p>".repeat(12); // 먼저 초기화
@@ -114,7 +115,6 @@ function setScoreboard() {
 
     const tmp = document.createElement("span");
     tmp.innerText = r;
-    console.log(scoreboard.children, i, r);
     scoreboard.children[i + 1].appendChild(tmp);
 
     for (let p of players) {
@@ -124,6 +124,7 @@ function setScoreboard() {
   }
 }
 
+/** 점수만 업데이트 */
 function updateScoreboard() {
   const scoreboard = document.querySelector("#scoreboard");
 
@@ -141,13 +142,17 @@ function updateScoreboard() {
 
 // update view
 function startupdate() {
-  document.querySelector("#startbtn").addEventListener("click", () => {
-    connection.send(
-      JSON.stringify({
-        type: "start",
-      })
-    );
-  });
+  if (obj.isadmin) {
+    document.querySelector("#startbtn").classList = [];
+
+    document.querySelector("#startbtn").addEventListener("click", () => {
+      connection.send(
+        JSON.stringify({
+          type: "start",
+        })
+      );
+    });
+  }
 
   setScoreboard();
 

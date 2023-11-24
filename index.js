@@ -18,6 +18,16 @@ function broadcast(data) {
   });
 }
 
+function senduserupdate() {
+  broadcast(
+    JSON.stringify({
+      type: "user-update",
+
+      players,
+    })
+  );
+}
+
 function tick() {
   broadcast(
     JSON.stringify({
@@ -49,13 +59,7 @@ wsServer.on("connection", (ws) => {
   players.push(obj);
   wsbyid[obj.id] = ws;
 
-  broadcast(
-    JSON.stringify({
-      type: "user-update",
-
-      players,
-    })
-  );
+  senduserupdate();
 
   ws.on("message", (data_) => {
     const data = JSON.parse(data_);
@@ -71,6 +75,8 @@ wsServer.on("connection", (ws) => {
             players,
           })
         );
+
+        senduserupdate();
 
         break;
       }
@@ -88,6 +94,7 @@ wsServer.on("connection", (ws) => {
     tick();
   });
 
+  /** @todo 게임 진행중에 나살미 나가면 어떻게 되는가 */
   ws.on("close", () => {
     const isadmin = obj.isadmin;
     const target = players.findIndex((p) => p.id === obj.id);
@@ -100,13 +107,7 @@ wsServer.on("connection", (ws) => {
       }
     }
 
-    broadcast(
-      JSON.stringify({
-        type: "user-update",
-
-        players,
-      })
-    );
+    senduserupdate();
   });
 });
 
@@ -128,6 +129,7 @@ function calculateScore(scoreidx, dices) {
     "스트레이트",
     "야추",
   ];
+  /** @todo fix score */
   switch (scoreRules[scoreidx]) {
     case "1":
       return c(1) * 1;

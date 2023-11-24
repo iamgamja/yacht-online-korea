@@ -8,6 +8,24 @@
     <script src="/client.js" defer></script>
 
     <style>
+      #menubar {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+      }
+
+      #startbtn {
+        width: 7rem;
+        height: 3rem;
+        border: 1px black solid;
+        border-radius: 0.5rem;
+        margin: 0.5rem 1rem;
+      }
+      #startbtn.hide {
+        display: none;
+      }
+
       #scoreboard {
         display: flex;
         flex-direction: column;
@@ -24,6 +42,7 @@
         width: 7rem;
         height: 3rem;
         border: 1px black solid;
+        border-radius: 0.5rem;
         margin: 0.5rem 1rem;
 
         display: flex;
@@ -33,9 +52,9 @@
     </style>
   </head>
   <body>
-    <p>
-      <button id="startbtn">sTart</button>
-    </p>
+    <div id="menubar">
+      <button id="startbtn" class="hide">sTart</button>
+    </div>
 
     <div id="scoreboard">
       <p></p>
