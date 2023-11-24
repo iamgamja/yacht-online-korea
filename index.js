@@ -82,7 +82,7 @@ wsServer.on("connection", (ws) => {
       }
 
       case "start": {
-        if (ws.isadmin) {
+        if (obj.isadmin) {
           isplaying = true;
           startgame();
         }

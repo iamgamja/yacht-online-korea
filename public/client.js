@@ -38,11 +38,14 @@ connection.onmessage = (message) => {
     }
 
     case "start": {
+      console.log("start!");
+
       break;
     }
 
     case "req-roll": {
       if (data.target === id) {
+        /** @todo 여기에 들어왔음에도 이벤트리스너가 붙지 않는다. 아 지금 떼는것도 잘못되어있네 */
         alert(data.dices.join(""));
         const playeridx = players.findIndex((x) => x.id === id);
 
