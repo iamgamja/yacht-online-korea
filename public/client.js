@@ -86,7 +86,7 @@ connection.onmessage = (message) => {
 function setScoreboard() {
   const scoreboard = document.querySelector("#scoreboard");
 
-  scoreboard.innerHTML = "<p></p>".repeat(11); // 먼저 초기화
+  scoreboard.innerHTML = "<p></p>".repeat(12); // 먼저 초기화
 
   scoreboard.children[0].appendChild(document.createElement("span"));
 
@@ -130,10 +130,10 @@ function updateScoreboard() {
   for (let y = 0; y < 11; y++) {
     for (let x = 0; x < players.length; x++) {
       if (
-        scoreboard.children[y + 1].children[x + 1].children[0].value !==
+        scoreboard.children[y + 1].children[x + 1].innerText !==
         players[x].score[y]
       )
-        scoreboard.children[y + 1].children[x + 1].children[0].value =
+        scoreboard.children[y + 1].children[x + 1].innerText =
           players[x].score[y];
     }
   }
