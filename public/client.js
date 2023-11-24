@@ -13,8 +13,6 @@ connection.onopen = () => {
         type: 'rename',
         name: prompt('nickname')
     }))
-
-    startupdate()
 }
 
 connection.onmessage = message => {
@@ -31,6 +29,8 @@ connection.onmessage = message => {
             id = data.id
             obj = players.find(p => p.id === id)
 
+            startupdate()
+
             break
         }
 
@@ -40,14 +40,25 @@ connection.onmessage = message => {
 
         case 'req-roll': {
             if (data.target === id) {
-                const i = players.findIndex(x => x.id === id)+1
+                alert(data.dices.join(''))
+                const playeridx = players.findIndex(x => x.id === id)
 
-                const table = document.querySelector('#scoreboard')
+                const handlers = []
 
-                const trs = [...table.children[0].children].slice(1)
-                for (let l of trs) {
-                    l.children[i].innerHTML = '<button></button>'
-                    // todo: add eventlistener
+                const scoreboard = document.querySelector('#scoreboard')
+
+                for (let i=0; i<11; i++) {
+                    const handler = function() {
+                        connection.send(JSON.stringify({
+                            type: 'confirm',
+                            value: i
+                        }))
+
+                        handlers.forEach((h, i) => scoreboard.children[i+1].removeEventListener('click', h))
+                    }
+
+                    handlers.push(handler)
+                    scoreboard.children[i+1].children[playeridx+1].addEventListener('click', handler)
                 }
             }
         }
@@ -59,29 +70,41 @@ connection.onmessage = message => {
 }
 
 function setScoreboard() {
-    const table = document.querySelector('#scoreboard')
+    const scoreboard = document.querySelector('#scoreboard')
 
-    let tmp = '<tbody>'
+    scoreboard.children[0].appendChild(document.createElement('span'))
 
-    tmp = '<tbody>'
-
-    tmp += '<th></th>'
-    for (let p of players) tmp += `<th>${p.name}</th>`
-
-    const scoreRules = ['1', '2', '3', '4', '5', '6', '3개', '4개', '풀하우스', '스트레이트', '야추']
-    for (let i in scoreRules) {
-        const r = scoreRules[i]
-        tmp += '<tr>'
-        tmp += `<td>${r}</td>`
-        for (let p of players) {
-            tmp += `<td>${p.score[i] ?? ''}</td>`
-        }
-        tmp += '</tr>'
+    for (let p of players) {
+        const tmp = document.createElement('span')
+        tmp.value = p.name
+        scoreboard.children[0].appendChild(tmp)
     }
 
-    tmp += '</tbody>'
+    const scoreRules = ['1', '2', '3', '4', '5', '6', '3개', '4개', '풀하우스', '스트레이트', '야추']
+    for (let i=0; i<scoreRules.length; i++) {
+        const r = scoreRules[i]
 
-    table.innerHTML = tmp
+        const tmp = document.createElement('span')
+        tmp.value = r
+        console.log(scoreboard.children, i, r)
+        scoreboard.children[i+1].appendChild(tmp)
+
+        for (let p of players) {
+            const tmp = document.createElement('span')
+            scoreboard.children[i+1].appendChild(tmp)
+        }
+    }
+}
+
+function updateScoreboard() {
+    const scoreboard = document.querySelector('#scoreboard')
+
+    for (let y=0; y<11; y++) {
+        for (let x=0; x<players.length; x++) {
+            if (scoreboard.children[y+1].children[x+1].children[0].value !== players[x].score[y])
+                scoreboard.children[y+1].children[x+1].children[0].value = players[x].score[y]
+        }
+    }
 }
 
 // update view
@@ -97,6 +120,7 @@ function startupdate() {
     function loop() {
         if (id !== null) {
             // do
+            updateScoreboard()
         }
 
         requestAnimationFrame(loop)

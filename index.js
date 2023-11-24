@@ -27,6 +27,7 @@ function tick() {
 }
 
 const players = []
+const wsbyid = {}
 
 let isplaying = false
 
@@ -39,9 +40,9 @@ wsServer.on('connection', ws => {
         name: '',
         isadmin: [...wsServer.clients].filter(client => client.readyState === websocket.OPEN).length === 1,
         score: Array(11).fill(null),
-        ws
     }
     players.push(obj)
+    wsbyid[obj.id] = ws
     tick()
 
     ws.on('message', data_ => {
@@ -180,11 +181,11 @@ async function startgame() {
                         }
                     }
         
-                    players[now].ws.addEventListener('message', handleRoll)
+                    wsbyid[players[now].id].addEventListener('message', handleRoll)
                 })
 
                 const [choice, value, handleRoll] = await promise
-                players[now].ws.removeEventListener('message', handleRoll)
+                wsbyid[players[now].id].removeEventListener('message', handleRoll)
                 if (choice === 'roll') {
                     for (let idx of value) {
                         dices[idx] = dice()
