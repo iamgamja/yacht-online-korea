@@ -18,6 +18,14 @@ function broadcast(data) {
     })
 }
 
+function tick() {
+    broadcast(JSON.stringify({
+        type: 'tick',
+
+        players
+    }))
+}
+
 const players = []
 
 wsServer.on('connection', ws => {
@@ -27,6 +35,7 @@ wsServer.on('connection', ws => {
         isadmin: [...wsServer.clients].filter(client => client.readyState === websocket.OPEN).length === 1,
     }
     players.push(obj)
+    tick()
 
     ws.on('message', data_ => {
         const data = JSON.parse(data_)
@@ -49,15 +58,21 @@ wsServer.on('connection', ws => {
             }
         }
 
-        broadcast(JSON.stringify({
-            type: 'tick',
-
-            players
-        }))
+        tick()
     })
 
     ws.on('close', () => {
+        const isadmin = obj.isadmin
         const target = players.findIndex(p => p.id === obj.id)
-        players.splice(target)
+        players.splice(target, 1)
+
+        // 방장이 나갔을 때 첫번째 사람 방장으
+        if (isadmin) {
+            if (players.length) {
+                players[0].isadmin = true
+            }
+        }
+
+        tick()
     })
 })
