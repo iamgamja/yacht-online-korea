@@ -76,7 +76,7 @@ function setScoreboard() {
 
     for (let p of players) {
         const tmp = document.createElement('span')
-        tmp.value = p.name
+        tmp.innerText = p.name
         scoreboard.children[0].appendChild(tmp)
     }
 
@@ -85,7 +85,7 @@ function setScoreboard() {
         const r = scoreRules[i]
 
         const tmp = document.createElement('span')
-        tmp.value = r
+        tmp.innerText = r
         console.log(scoreboard.children, i, r)
         scoreboard.children[i+1].appendChild(tmp)
 
