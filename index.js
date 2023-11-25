@@ -306,13 +306,11 @@ async function startgame() {
 
   // 게임이 끝남
 
-  isplaying = false;
-
-  // 후처리가 필요할 수 있으므로 players를 보내준다
   broadcast({
     type: "end",
   });
 
+  isplaying = false;
   players = [];
   wsbyid = {};
 }
