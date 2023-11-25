@@ -10,6 +10,10 @@ const server = app.listen(5125, function () {
 const websocket = require("ws");
 const wsServer = new websocket.Server({ server });
 
+/**
+ *
+ * @param {string} data
+ */
 function broadcast(data) {
   wsServer.clients.forEach((client) => {
     if (client.readyState === websocket.OPEN) {
@@ -38,7 +42,12 @@ function tick() {
   );
 }
 
+/** @typedef {{id: string, name: string, isadmin: boolean, score: (number|null)[]}} obj */
+
+/** @type {obj[]} */
 const players = [];
+
+/** @type {{[id: string]: websocket}} */
 const wsbyid = {};
 
 let isplaying = false;
@@ -47,6 +56,7 @@ wsServer.on("connection", (ws) => {
   // 플레이중일 때는 추가하지 않는다, 관전
   if (isplaying) return;
 
+  /** @type {obj} */
   const obj = {
     id: Math.random().toString(),
     name: "",
@@ -94,7 +104,7 @@ wsServer.on("connection", (ws) => {
     tick();
   });
 
-  /** @todo 게임 진행중에 나살미 나가면 어떻게 되는가 */
+  /** @todo 게임 진행중에 사람이 나가면 어떻게 되는가 */
   ws.on("close", () => {
     const isadmin = obj.isadmin;
     const target = players.findIndex((p) => p.id === obj.id);
@@ -188,7 +198,7 @@ function calculateScore(scoreidx, dices) {
 }
 
 function dice() {
-  return Math.ceil(Math.random() * 6) + 1;
+  return Math.floor(Math.random() * 6) + 1;
 }
 
 async function startgame() {
@@ -237,11 +247,11 @@ async function startgame() {
             }
           };
 
-          wsbyid[players[now].id].addEventListener("message", handleRoll);
+          wsbyid[players[now].id].on("message", handleRoll);
         });
 
         const [choice, value, handleRoll] = await promise;
-        wsbyid[players[now].id].removeEventListener("message", handleRoll);
+        wsbyid[players[now].id].off("message", handleRoll);
         if (choice === "roll") {
           for (let idx of value) {
             dices[idx] = dice();

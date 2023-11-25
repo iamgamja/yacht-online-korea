@@ -1,6 +1,13 @@
+/** @typedef {{id: string, name: string, isadmin: boolean, score: (number|null)[]}} obj */
+
+/** @type {string | null} */
 let id = null;
+/** @type {obj | null} */
 let obj = null;
+/** @type {obj[] | null} */
 let players = null;
+
+let ismyturn = false;
 
 const wsprotocol = window.location.protocol === "https:" ? "wss" : "ws";
 const connection = new WebSocket(
@@ -45,34 +52,11 @@ connection.onmessage = (message) => {
 
     case "req-roll": {
       if (data.target === id) {
-        /** @todo 여기에 들어왔음에도 이벤트리스너가 붙지 않는다. 아 지금 떼는것도 잘못되어있네 */
-        alert(data.dices.join(""));
-        const playeridx = players.findIndex((x) => x.id === id);
+        ismyturn = true;
 
-        const handlers = [];
-
-        const scoreboard = document.querySelector("#scoreboard");
-
-        for (let i = 0; i < 11; i++) {
-          const handler = function () {
-            connection.send(
-              JSON.stringify({
-                type: "confirm",
-                value: i,
-              })
-            );
-
-            handlers.forEach((h, i) =>
-              scoreboard.children[i + 1].removeEventListener("click", h)
-            );
-          };
-
-          handlers.push(handler);
-          scoreboard.children[i + 1].children[playeridx + 1].addEventListener(
-            "click",
-            handler
-          );
-        }
+        alert(
+          data.dices.join("")
+        ); /** @todo 주사위 표시하기 + 고정 할 수 있게 하기 */
       }
     }
 
@@ -86,8 +70,25 @@ connection.onmessage = (message) => {
   }
 };
 
+/**
+ *
+ * @param {number} scoreidx
+ */
+function clickHandler(scoreidx) {
+  if (!ismyturn) return;
+  if (obj.score[scoreidx] !== null) return;
+
+  connection.send(
+    JSON.stringify({
+      type: "confirm",
+      value: scoreidx,
+    })
+  );
+
+  ismyturn = false;
+}
+
 function setScoreboard() {
-  console.log(players);
   const scoreboard = document.querySelector("#scoreboard");
 
   scoreboard.innerHTML = "<p></p>".repeat(12); // 먼저 초기화
@@ -122,6 +123,8 @@ function setScoreboard() {
 
     for (let p of players) {
       const tmp = document.createElement("span");
+      if (p.id == id) tmp.addEventListener("click", () => clickHandler(i));
+      tmp.innerText = p.score[i] ?? "";
       scoreboard.children[i + 1].appendChild(tmp);
     }
   }
