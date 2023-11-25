@@ -12,35 +12,30 @@ const wsServer = new websocket.Server({ server });
 
 /**
  *
- * @param {string} data
+ * @param {object} data
  */
 function broadcast(data) {
+  data.players = players;
+  data.isplaying = isplaying;
+  const tmp = JSON.stringify(data);
+
   wsServer.clients.forEach((client) => {
     if (client.readyState === websocket.OPEN) {
-      client.send(data);
+      client.send(tmp);
     }
   });
 }
 
 function senduserupdate() {
-  broadcast(
-    JSON.stringify({
-      type: "user-update",
-
-      players,
-      isplaying,
-    })
-  );
+  broadcast({
+    type: "user-update",
+  });
 }
 
 function tick() {
-  broadcast(
-    JSON.stringify({
-      type: "tick",
-
-      players,
-    })
-  );
+  broadcast({
+    type: "tick",
+  });
 }
 
 /** @typedef {{id: string, name: string, isadmin: boolean, score: (number|null)[]}} obj */
@@ -97,6 +92,15 @@ wsServer.on("connection", (ws) => {
           isplaying = true;
           startgame();
         }
+
+        break;
+      }
+
+      case "changePin": {
+        broadcast({
+          type: "changePin",
+          pin: data.pin,
+        });
 
         break;
       }
@@ -203,13 +207,9 @@ function dice() {
 }
 
 async function startgame() {
-  broadcast(
-    JSON.stringify({
-      type: "start",
-
-      players,
-    })
-  );
+  broadcast({
+    type: "start",
+  });
 
   for (let i = 0; i < 11; i++) {
     for (let now = 0; now < players.length; now++) {
@@ -218,16 +218,12 @@ async function startgame() {
       let remain = 2;
 
       while (1) {
-        broadcast(
-          JSON.stringify({
-            type: "req-roll",
-            dices,
-            remain,
-            target: players[now].id,
-
-            players,
-          })
-        );
+        broadcast({
+          type: "req-roll",
+          dices,
+          remain,
+          target: players[now].id,
+        });
 
         const promise = new Promise((res, rej) => {
           const handleRoll = (data_) => {

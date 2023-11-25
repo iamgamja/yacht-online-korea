@@ -34,6 +34,8 @@ connection.onmessage = (message) => {
     obj = players.find((p) => p.id === id);
   }
 
+  console.log("!", data.type, data);
+
   switch (data.type) {
     case "setid": {
       id = data.id;
@@ -55,23 +57,40 @@ connection.onmessage = (message) => {
     }
 
     case "req-roll": {
+      // 주사위, 리롤 횟수 표시
+      for (let i = 0; i < 5; i++) {
+        document.querySelector("#diceboard").children[i].children[1].innerText =
+          data.dices[i];
+      }
+      document.querySelector("#remain").innerText = data.remain;
+
+      // remain이 2일 때만 고정 초기화
+      if (data.remain === 2) {
+        [...document.querySelector("#diceboard").children].forEach((e) => {
+          e.children[0].checked = false;
+        });
+      }
+
       if (data.target === id) {
         ismyturn = true;
 
-        for (let i = 0; i < 5; i++) {
-          document.querySelector("#diceboard").children[
-            i
-          ].children[1].innerText = data.dices[i];
-        }
-
-        document.querySelector("#remain").innerText = data.remain;
-
+        // 리롤 가능 횟수가 0이 아닐 때만 리롤 가능
         if (data.remain === 0)
           document.querySelector("#rerollbtn").setAttribute("disabled", "");
         else document.querySelector("#rerollbtn").removeAttribute("disabled");
+
+        // 고정 가능
+        [...document.querySelector("#diceboard").children].forEach((e) => {
+          e.children[0].removeAttribute("disabled");
+        });
       } else {
-        // 자신의 차례가 아닐 때
+        // 리롤 안됨
         document.querySelector("#rerollbtn").setAttribute("disabled", "");
+
+        // 고정 안됨
+        [...document.querySelector("#diceboard").children].forEach((e) => {
+          e.children[0].setAttribute("disabled", "");
+        });
       }
 
       break;
@@ -85,6 +104,15 @@ connection.onmessage = (message) => {
         document.querySelector("#menubar").classList = [];
       } else {
         document.querySelector("#menubar").classList = ["hide"];
+      }
+
+      break;
+    }
+
+    case "changePin": {
+      for (let i = 0; i < 5; i++) {
+        document.querySelector("#diceboard").children[i].children[0].checked =
+          data.pin[i];
       }
 
       break;
@@ -179,6 +207,23 @@ function startupdate() {
         type: "start",
       })
     );
+  });
+
+  document.querySelectorAll(".dice").forEach((e) => {
+    e.addEventListener("click", () => {
+      if (!ismyturn) return;
+
+      connection.send(
+        JSON.stringify({
+          type: "changePin",
+          pin: [0, 1, 2, 3, 4].map(
+            (i) =>
+              document.querySelector("#diceboard").children[i].children[0]
+                .checked
+          ),
+        })
+      );
+    });
   });
 
   document.querySelector("#rerollbtn").addEventListener("click", () => {
