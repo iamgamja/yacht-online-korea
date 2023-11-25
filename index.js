@@ -113,7 +113,6 @@ wsServer.on("connection", (ws) => {
     tick();
   });
 
-  /** @todo 게임 진행중에 사람이 나가면 어떻게 되는가 */
   ws.on("close", () => {
     // 방장이 나갔을 때 첫번째 사람 방장으로
     if (obj.isadmin) {
