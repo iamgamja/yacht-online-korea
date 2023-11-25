@@ -8,6 +8,12 @@
     <script src="/client.js" defer></script>
 
     <style>
+      #menubar.hide,
+      #diceboard.hide,
+      .hide {
+        display: none;
+      }
+
       #menubar {
         display: flex;
 
@@ -22,8 +28,44 @@
         border-radius: 0.5rem;
         margin: 0.5rem 1rem;
       }
-      #startbtn.hide {
-        display: none;
+
+      #diceboard {
+        display: flex;
+
+        justify-content: center;
+      }
+
+      .dice {
+        all: unset;
+
+        width: 5rem;
+        height: 5rem;
+        margin: 1rem;
+
+        border: 1px black solid;
+        border-radius: 0.5rem;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 3rem;
+      }
+
+      .dice:has(> :checked) {
+        background-color: #93ec6f;
+      }
+
+      #rerollbtn {
+        width: 5rem;
+        height: 5rem;
+        margin: 1rem;
+        border: 1px black solid;
+        border-radius: 0.5rem;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
 
       #scoreboard {
@@ -52,8 +94,27 @@
     </style>
   </head>
   <body>
-    <div id="menubar">
-      <button id="startbtn" class="hide">sTart</button>
+    <div id="menubar" class="hide">
+      <button id="startbtn">sTart</button>
+    </div>
+
+    <div id="diceboard" class="hide">
+      <label class="dice"
+        ><input type="checkbox" class="hide" /><output></output
+      ></label>
+      <label class="dice"
+        ><input type="checkbox" class="hide" /><output></output
+      ></label>
+      <label class="dice"
+        ><input type="checkbox" class="hide" /><output></output
+      ></label>
+      <label class="dice"
+        ><input type="checkbox" class="hide" /><output></output
+      ></label>
+      <label class="dice"
+        ><input type="checkbox" class="hide" /><output></output
+      ></label>
+      <button id="rerollbtn">리롤 (<output id="remain">2</output>)</button>
     </div>
 
     <div id="scoreboard">

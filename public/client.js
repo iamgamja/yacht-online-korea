@@ -47,6 +47,10 @@ connection.onmessage = (message) => {
     case "start": {
       console.log("start!");
 
+      document.querySelector("#diceboard").classList = [];
+
+      document.querySelector("#menubar").classList = ["hide"];
+
       break;
     }
 
@@ -54,14 +58,36 @@ connection.onmessage = (message) => {
       if (data.target === id) {
         ismyturn = true;
 
-        alert(
-          data.dices.join("")
-        ); /** @todo 주사위 표시하기 + 고정 할 수 있게 하기 */
+        for (let i = 0; i < 5; i++) {
+          document.querySelector("#diceboard").children[
+            i
+          ].children[1].innerText = data.dices[i];
+        }
+
+        document.querySelector("#remain").innerText = data.remain;
+
+        if (data.remain === 0)
+          document.querySelector("#rerollbtn").setAttribute("disabled", "");
+        else document.querySelector("#rerollbtn").removeAttribute("disabled");
+      } else {
+        // 자신의 차례가 아닐 때
+        document.querySelector("#rerollbtn").setAttribute("disabled", "");
       }
+
+      break;
     }
 
     case "user-update": {
       setScoreboard();
+
+      if (obj?.isadmin && !data.isplaying) {
+        console.log(obj, data);
+        document.querySelector("#menubar").classList = [];
+      } else {
+        document.querySelector("#menubar").classList = ["hide"];
+      }
+
+      break;
     }
 
     case "tick": {
@@ -71,10 +97,9 @@ connection.onmessage = (message) => {
 };
 
 /**
- *
  * @param {number} scoreidx
  */
-function clickHandler(scoreidx) {
+function scoreClickHandler(scoreidx) {
   if (!ismyturn) return;
   if (obj.score[scoreidx] !== null) return;
 
@@ -123,7 +148,7 @@ function setScoreboard() {
 
     for (let p of players) {
       const tmp = document.createElement("span");
-      if (p.id == id) tmp.addEventListener("click", () => clickHandler(i));
+      if (p.id == id) tmp.addEventListener("click", () => scoreClickHandler(i));
       tmp.innerText = p.score[i] ?? "";
       scoreboard.children[i + 1].appendChild(tmp);
     }
@@ -148,17 +173,30 @@ function updateScoreboard() {
 
 // update view
 function startupdate() {
-  if (obj.isadmin) {
-    document.querySelector("#startbtn").classList = [];
+  document.querySelector("#startbtn").addEventListener("click", () => {
+    connection.send(
+      JSON.stringify({
+        type: "start",
+      })
+    );
+  });
 
-    document.querySelector("#startbtn").addEventListener("click", () => {
-      connection.send(
-        JSON.stringify({
-          type: "start",
-        })
-      );
-    });
-  }
+  document.querySelector("#rerollbtn").addEventListener("click", () => {
+    if (!ismyturn) return;
+
+    connection.send(
+      JSON.stringify({
+        type: "roll",
+        roll: [0, 1, 2, 3, 4].filter(
+          (i) =>
+            !document.querySelector("#diceboard").children[i].children[0]
+              .checked
+        ),
+      })
+    );
+
+    ismyturn = false;
+  });
 
   setScoreboard();
 

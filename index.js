@@ -28,6 +28,7 @@ function senduserupdate() {
       type: "user-update",
 
       players,
+      isplaying,
     })
   );
 }
@@ -92,7 +93,7 @@ wsServer.on("connection", (ws) => {
       }
 
       case "start": {
-        if (obj.isadmin) {
+        if (obj.isadmin && !isplaying) {
           isplaying = true;
           startgame();
         }
@@ -177,7 +178,7 @@ function calculateScore(scoreidx, dices) {
         return dice.reduce((a, b) => a + b);
       return 0;
     case "풀하우스": {
-      const tmp = [...dice].sort();
+      const tmp = [...dices].sort();
       if (
         tmp[0] === tmp[1] &&
         tmp[3] === tmp[4] &&
@@ -187,7 +188,7 @@ function calculateScore(scoreidx, dices) {
       return 0;
     }
     case "스트레이트": {
-      const tmp = [...dice].sort().join("");
+      const tmp = [...dices].sort().join("");
       if (tmp === "12345" || tmp === "23456") return 25;
       return 0;
     }
@@ -212,7 +213,7 @@ async function startgame() {
 
   for (let i = 0; i < 11; i++) {
     for (let now = 0; now < players.length; now++) {
-      const dices = [dice(), dice(), dice(), dice(), dice(), dice()];
+      const dices = [dice(), dice(), dice(), dice(), dice()];
 
       let remain = 2;
 
@@ -234,13 +235,13 @@ async function startgame() {
 
             switch (data.type) {
               case "roll": {
-                res([1, data.roll, handleRoll]);
+                res([data.type, data.roll, handleRoll]);
 
                 break;
               }
 
               case "confirm": {
-                res([2, data.value, handleRoll]);
+                res([data.type, data.value, handleRoll]);
 
                 break;
               }
@@ -267,4 +268,8 @@ async function startgame() {
       tick();
     }
   }
+
+  // 게임이 끝남
+
+  /** @todo */
 }
