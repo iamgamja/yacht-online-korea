@@ -118,6 +118,15 @@ connection.onmessage = (message) => {
       break;
     }
 
+    case "end": {
+      document.querySelector("#diceboard").classList = [];
+      document.querySelector("#menubar").classList = ["hide"];
+
+      /** @todo 우승자 찾고 강조, 새로고침 버튼 추가 */
+
+      break;
+    }
+
     case "tick": {
       break;
     }

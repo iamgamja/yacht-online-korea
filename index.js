@@ -12,7 +12,7 @@ const wsServer = new websocket.Server({ server });
 
 /**
  *
- * @param {object} data
+ * @param {{type: string}} data
  */
 function broadcast(data) {
   data.players = players;
@@ -41,10 +41,10 @@ function tick() {
 /** @typedef {{id: string, name: string, isadmin: boolean, score: (number|null)[]}} obj */
 
 /** @type {obj[]} */
-const players = [];
+let players = [];
 
 /** @type {{[id: string]: websocket}} */
-const wsbyid = {};
+let wsbyid = {};
 
 let isplaying = false;
 
@@ -267,5 +267,9 @@ async function startgame() {
 
   // 게임이 끝남
 
-  /** @todo */
+  broadcast({
+    type: "end",
+  });
+
+  isplaying = false;
 }
