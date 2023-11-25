@@ -38,7 +38,7 @@ function tick() {
   });
 }
 
-/** @typedef {{id: string, name: string, isadmin: boolean, score: (number|null)[]}} obj */
+/** @typedef {{id: string, name: string, isadmin: boolean, score: (number|null)[], isleave: boolean}} obj */
 
 /** @type {obj[]} */
 let players = [];
@@ -50,7 +50,10 @@ let isplaying = false;
 
 wsServer.on("connection", (ws) => {
   // 플레이중일 때는 추가하지 않는다, 관전
-  if (isplaying) return;
+  if (isplaying) {
+    tick(); // 들어온 사람이 화면 업데이트를 해야하니까
+    return;
+  }
 
   /** @type {obj} */
   const obj = {
@@ -61,6 +64,7 @@ wsServer.on("connection", (ws) => {
         (client) => client.readyState === websocket.OPEN
       ).length === 1,
     score: Array(11).fill(null),
+    isleave: false,
   };
   players.push(obj);
   wsbyid[obj.id] = ws;
@@ -111,18 +115,25 @@ wsServer.on("connection", (ws) => {
 
   /** @todo 게임 진행중에 사람이 나가면 어떻게 되는가 */
   ws.on("close", () => {
-    const isadmin = obj.isadmin;
-    const target = players.findIndex((p) => p.id === obj.id);
-    players.splice(target, 1);
-
     // 방장이 나갔을 때 첫번째 사람 방장으로
-    if (isadmin) {
+    if (obj.isadmin) {
       if (players.length) {
         players[0].isadmin = true;
       }
     }
 
-    senduserupdate();
+    if (isplaying) {
+      // 진행 중이다.
+      // players는 수정하지 않는다
+      obj.isleave = true;
+    } else {
+      // 진행 중이 아니다.
+      const target = players.findIndex((p) => p.id === obj.id);
+      if (target === -1) return;
+      players.splice(target, 1);
+
+      senduserupdate();
+    }
   });
 });
 
@@ -213,6 +224,10 @@ async function startgame() {
 
   for (let i = 0; i < 11; i++) {
     for (let now = 0; now < players.length; now++) {
+      if (players[now].isleave) continue;
+
+      /** @todo 현재 차례였던 사람이 나갔을 때, 계속 기다릴 듯 */
+
       const dices = [dice(), dice(), dice(), dice(), dice()];
 
       let remain = 2;
@@ -271,5 +286,7 @@ async function startgame() {
     type: "end",
   });
 
+  players = [];
+  wsbyid = {};
   isplaying = false;
 }

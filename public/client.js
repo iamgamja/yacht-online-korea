@@ -1,4 +1,4 @@
-/** @typedef {{id: string, name: string, isadmin: boolean, score: (number|null)[]}} obj */
+/** @typedef {{id: string, name: string, isadmin: boolean, score: (number|null)[], isleave: boolean}} obj */
 
 /** @type {string | null} */
 let id = null;
