@@ -162,8 +162,8 @@ function calculateScore(scoreidx, dices) {
     "6",
     "3개",
     "4개",
-    "풀하우스",
-    "스트레이트",
+    "풀하",
+    "스트",
     "야추",
   ];
   switch (scoreRules[scoreidx]) {
@@ -202,7 +202,7 @@ function calculateScore(scoreidx, dices) {
       )
         return dices.reduce((a, b) => a + b);
       return 0;
-    case "풀하우스": {
+    case "풀하": {
       const tmp = [...dices].sort();
       if (
         tmp[0] === tmp[1] &&
@@ -212,7 +212,7 @@ function calculateScore(scoreidx, dices) {
         return 25;
       return 0;
     }
-    case "스트레이트": {
+    case "스트": {
       const tmp = [...dices].sort().join("");
       if (tmp === "12345" || tmp === "23456") return 40;
       return 0;
