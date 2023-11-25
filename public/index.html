@@ -107,6 +107,39 @@
         background-color: rgb(82, 82, 82);
       }
 
+      .nickname.winner {
+        animation-duration: 3s;
+        animation-name: rainbow;
+        animation-iteration-count: infinite;
+      }
+
+      @keyframes rainbow {
+        0% {
+          outline: 3px solid #ff2a2a;
+        }
+        15% {
+          outline: 3px solid #ff7a2a;
+        }
+        30% {
+          outline: 3px solid #ffc52a;
+        }
+        45% {
+          outline: 3px solid #43ff2a;
+        }
+        60% {
+          outline: 3px solid #2a89ff;
+        }
+        75% {
+          outline: 3px solid #202082;
+        }
+        90% {
+          outline: 3px solid #6b2aff;
+        }
+        100% {
+          outline: 3px solid #e82aff;
+        }
+      }
+
       /* 기본적으로 점수가 채워져있는 칸을 강조하지만, 미리보기는 강조하지 않음 */
       .scorebutton:not(:empty):not(.preview) {
         background-color: #93ec6f;

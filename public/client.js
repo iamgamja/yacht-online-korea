@@ -124,10 +124,23 @@ connection.onmessage = (message) => {
     }
 
     case "end": {
-      /** @todo 우승자 찾고 강조, 새로고침 버튼 추가 */
-
       resetStyleScoreboard();
       resetPreviewScoreboard();
+
+      // 우승자 강조
+      const max_score = Math.max(
+        ...players.map((p) => p.score.reduce((a, b) => a + b))
+      );
+      const winners = players.filter(
+        (p) => p.score.reduce((a, b) => a + b) === max_score
+      );
+      winners.forEach((winner) => {
+        const idx = players.findIndex((p) => p.id === winner.id);
+        document
+          .querySelector("#scoreboard")
+          .children[0].children[idx + 1].classList.add("winner");
+      });
+
       break;
     }
 
