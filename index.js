@@ -208,7 +208,7 @@ function calculateScore(scoreidx, dices) {
       return 0;
     }
     case "야추":
-      if (c(dices[0]) === 6) return 50;
+      if (c(dices[0]) === 5) return 50;
       return 0;
   }
 }
