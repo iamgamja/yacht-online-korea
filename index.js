@@ -48,6 +48,13 @@ let wsbyid = {};
 
 let isplaying = false;
 
+/** 현재 턴인 플레이어 */
+let nowplayer = null;
+/** 요청 기다리는 promise를 reject하기 위한 함수 */
+let rejectpromise = null;
+/** 요청을 기다리는 handler */
+let handleRoll = null;
+
 wsServer.on("connection", (ws) => {
   // 플레이중일 때는 추가하지 않는다, 관전
   if (isplaying) {
@@ -125,6 +132,11 @@ wsServer.on("connection", (ws) => {
       // 진행 중이다.
       // players는 수정하지 않는다
       obj.isleave = true;
+
+      if (obj.id === nowplayer?.id) {
+        // 현재 턴인 플레이어가 나갔다
+        rejectpromise();
+      }
     } else {
       // 진행 중이 아니다.
       const target = players.findIndex((p) => p.id === obj.id);
@@ -224,7 +236,7 @@ async function startgame() {
     for (let now = 0; now < players.length; now++) {
       if (players[now].isleave) continue;
 
-      /** @todo 현재 차례였던 사람이 나갔을 때, 계속 기다릴 듯 */
+      nowplayer = players[now];
 
       const dices = [dice(), dice(), dice(), dice(), dice()];
 
@@ -239,18 +251,20 @@ async function startgame() {
         });
 
         const promise = new Promise((res, rej) => {
-          const handleRoll = (data_) => {
+          rejectpromise = rej;
+
+          handleRoll = (data_) => {
             const data = JSON.parse(data_);
 
             switch (data.type) {
               case "roll": {
-                res([data.type, data.roll, handleRoll]);
+                res([data.type, data.roll]);
 
                 break;
               }
 
               case "confirm": {
-                res([data.type, data.value, handleRoll]);
+                res([data.type, data.value]);
 
                 break;
               }
@@ -260,16 +274,28 @@ async function startgame() {
           wsbyid[players[now].id].on("message", handleRoll);
         });
 
-        const [choice, value, handleRoll] = await promise;
+        const [status, value] = await (async () => {
+          try {
+            return await promise;
+          } catch {
+            return ["leave", null]; // 현재 턴인 플레이어가 나갔음을 의미
+          }
+        })();
+
+        if (status === "leave") {
+          break;
+        }
+
         wsbyid[players[now].id].off("message", handleRoll);
-        if (choice === "roll") {
+
+        if (status === "roll") {
           for (let idx of value) {
             dices[idx] = dice();
           }
-
           remain--;
         } else {
           players[now].score[value] = calculateScore(value, dices);
+
           break;
         }
       }
