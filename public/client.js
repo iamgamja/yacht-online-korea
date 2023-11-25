@@ -63,11 +63,11 @@ connection.onmessage = (message) => {
     }
 
     case "req-roll": {
-      styleScoreboard(players.findIndex((p) => p.id === data.target));
       previewScoreboard(
         players.findIndex((p) => p.id === data.target),
         data.dices
       );
+      styleScoreboard(players.findIndex((p) => p.id === data.target));
 
       // 주사위, 리롤 횟수 표시
       for (let i = 0; i < 5; i++) {
