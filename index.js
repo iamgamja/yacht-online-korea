@@ -155,7 +155,6 @@ function calculateScore(scoreidx, dices) {
     "스트레이트",
     "야추",
   ];
-  /** @todo fix score */
   switch (scoreRules[scoreidx]) {
     case "1":
       return c(1) * 1;
@@ -204,7 +203,7 @@ function calculateScore(scoreidx, dices) {
     }
     case "스트레이트": {
       const tmp = [...dices].sort().join("");
-      if (tmp === "12345" || tmp === "23456") return 25;
+      if (tmp === "12345" || tmp === "23456") return 40;
       return 0;
     }
     case "야추":
