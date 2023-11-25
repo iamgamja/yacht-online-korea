@@ -80,7 +80,10 @@
         margin: 0;
       }
 
-      span {
+      .blank,
+      .nickname,
+      .scorename,
+      .scorebutton {
         width: 7rem;
         height: 3rem;
         border: 1px black solid;
@@ -90,6 +93,23 @@
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      .scorename {
+        background-color: #93ec6f;
+      }
+
+      .nickname.now {
+        background-color: #93ec6f;
+      }
+
+      .leave {
+        background-color: rgb(82, 82, 82);
+      }
+
+      /* 기본적으로 점수가 채워져있는 칸을 강조하지만, 미리보기는 강조하지 않음 */
+      .scorebutton:not(:empty):not(.preview) {
+        background-color: #93ec6f;
       }
     </style>
   </head>

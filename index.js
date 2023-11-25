@@ -189,7 +189,7 @@ function calculateScore(scoreidx, dices) {
         c(5) >= 3 ||
         c(6) >= 3
       )
-        return dice.reduce((a, b) => a + b);
+        return dices.reduce((a, b) => a + b);
       return 0;
     case "4개":
       if (
@@ -200,7 +200,7 @@ function calculateScore(scoreidx, dices) {
         c(5) >= 4 ||
         c(6) >= 4
       )
-        return dice.reduce((a, b) => a + b);
+        return dices.reduce((a, b) => a + b);
       return 0;
     case "풀하우스": {
       const tmp = [...dices].sort();
@@ -306,11 +306,13 @@ async function startgame() {
 
   // 게임이 끝남
 
-  players = [];
-  wsbyid = {};
   isplaying = false;
 
+  // 후처리가 필요할 수 있으므로 players를 보내준다
   broadcast({
     type: "end",
   });
+
+  players = [];
+  wsbyid = {};
 }
