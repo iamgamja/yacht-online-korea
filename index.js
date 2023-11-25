@@ -282,11 +282,11 @@ async function startgame() {
 
   // 게임이 끝남
 
-  broadcast({
-    type: "end",
-  });
-
   players = [];
   wsbyid = {};
   isplaying = false;
+
+  broadcast({
+    type: "end",
+  });
 }

@@ -34,6 +34,18 @@ connection.onmessage = (message) => {
     obj = players.find((p) => p.id === id);
   }
 
+  if (obj?.isadmin && !data.isplaying) {
+    document.querySelector("#menubar").classList = [];
+  } else {
+    document.querySelector("#menubar").classList = ["hide"];
+  }
+
+  if (data.isplaying) {
+    document.querySelector("#diceboard").classList = [];
+  } else {
+    document.querySelector("#diceboard").classList = ["hide"];
+  }
+
   console.log("!", data.type, data);
 
   switch (data.type) {
@@ -41,17 +53,11 @@ connection.onmessage = (message) => {
       id = data.id;
       obj = players.find((p) => p.id === id);
 
-      startupdate();
-
       break;
     }
 
     case "start": {
       console.log("start!");
-
-      document.querySelector("#diceboard").classList = [];
-
-      document.querySelector("#menubar").classList = ["hide"];
 
       break;
     }
@@ -99,13 +105,6 @@ connection.onmessage = (message) => {
     case "user-update": {
       setScoreboard();
 
-      if (obj?.isadmin && !data.isplaying) {
-        console.log(obj, data);
-        document.querySelector("#menubar").classList = [];
-      } else {
-        document.querySelector("#menubar").classList = ["hide"];
-      }
-
       break;
     }
 
@@ -119,9 +118,6 @@ connection.onmessage = (message) => {
     }
 
     case "end": {
-      document.querySelector("#diceboard").classList = [];
-      document.querySelector("#menubar").classList = ["hide"];
-
       /** @todo 우승자 찾고 강조, 새로고침 버튼 추가 */
 
       break;
@@ -196,6 +192,10 @@ function setScoreboard() {
 function updateScoreboard() {
   const scoreboard = document.querySelector("#scoreboard");
 
+  // setScoreboard를 해야하는가
+  if (scoreboard.children[0].children.length != players.length + 1)
+    setScoreboard();
+
   for (let y = 0; y < 11; y++) {
     for (let x = 0; x < players.length; x++) {
       if (
@@ -209,59 +209,50 @@ function updateScoreboard() {
 }
 
 // update view
-function startupdate() {
-  document.querySelector("#startbtn").addEventListener("click", () => {
-    connection.send(
-      JSON.stringify({
-        type: "start",
-      })
-    );
-  });
+document.querySelector("#startbtn").addEventListener("click", () => {
+  connection.send(
+    JSON.stringify({
+      type: "start",
+    })
+  );
+});
 
-  document.querySelectorAll(".dice").forEach((e) => {
-    e.addEventListener("click", () => {
-      if (!ismyturn) return;
-
-      connection.send(
-        JSON.stringify({
-          type: "changePin",
-          pin: [0, 1, 2, 3, 4].map(
-            (i) =>
-              document.querySelector("#diceboard").children[i].children[0]
-                .checked
-          ),
-        })
-      );
-    });
-  });
-
-  document.querySelector("#rerollbtn").addEventListener("click", () => {
+document.querySelectorAll(".dice").forEach((e) => {
+  e.addEventListener("click", () => {
     if (!ismyturn) return;
 
     connection.send(
       JSON.stringify({
-        type: "roll",
-        roll: [0, 1, 2, 3, 4].filter(
+        type: "changePin",
+        pin: [0, 1, 2, 3, 4].map(
           (i) =>
-            !document.querySelector("#diceboard").children[i].children[0]
-              .checked
+            document.querySelector("#diceboard").children[i].children[0].checked
         ),
       })
     );
-
-    ismyturn = false;
   });
+});
 
-  setScoreboard();
+document.querySelector("#rerollbtn").addEventListener("click", () => {
+  if (!ismyturn) return;
 
-  function loop() {
-    if (id !== null) {
-      // do
-      updateScoreboard();
-    }
+  connection.send(
+    JSON.stringify({
+      type: "roll",
+      roll: [0, 1, 2, 3, 4].filter(
+        (i) =>
+          !document.querySelector("#diceboard").children[i].children[0].checked
+      ),
+    })
+  );
 
-    requestAnimationFrame(loop);
-  }
+  ismyturn = false;
+});
 
-  loop();
+function loop() {
+  if (players !== null) updateScoreboard();
+
+  requestAnimationFrame(loop);
 }
+
+loop();
