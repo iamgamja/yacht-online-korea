@@ -170,7 +170,7 @@ function scoreClickHandler(scoreidx) {
 function setScoreboard() {
   const scoreboard = document.querySelector("#scoreboard");
 
-  scoreboard.innerHTML = "<p></p>".repeat(12); // 먼저 초기화
+  scoreboard.innerHTML = "<p></p>".repeat(13); // 먼저 초기화
 
   const tmp = document.createElement("span");
   tmp.classList.add("blank");
@@ -212,6 +212,18 @@ function setScoreboard() {
       scoreboard.children[i + 1].appendChild(tmp);
     }
   }
+
+  const tmp2 = document.createElement("span");
+  tmp2.innerText = "합계";
+  tmp2.classList.add("scorename");
+  scoreboard.children[12].appendChild(tmp2);
+
+  for (let p of players) {
+    const tmp = document.createElement("span");
+    tmp.innerText = p.score.reduce((a, b) => a + b);
+    tmp.classList.add("sum");
+    scoreboard.children[12].appendChild(tmp);
+  }
 }
 
 /** 점수만 업데이트 */
@@ -231,6 +243,12 @@ function updateScoreboard() {
         scoreboard.children[y + 1].children[x + 1].innerText =
           players[x].score[y];
     }
+  }
+
+  for (let i = 0; i < players.length; i++) {
+    scoreboard.children[12].children[i + 1].innerText = players[i].score.reduce(
+      (a, b) => a + b
+    );
   }
 }
 
@@ -256,6 +274,7 @@ function styleScoreboard(playeridx) {
       for (let y = 0; y < 11; y++) {
         scoreboard.children[y + 1].children[x + 1].classList.add("leave");
       }
+      scoreboard.children[12].children[x + 1].classList.add("leave");
     }
   }
 }
