@@ -8,6 +8,10 @@
     <script src="/client.js" defer></script>
 
     <style>
+      #tooltip {
+        position: fixed;
+      }
+
       #menubar.hide,
       #diceboard.hide,
       .hide {
@@ -146,6 +150,8 @@
     </style>
   </head>
   <body>
+    <span id="tooltip">재시작하려면 <a href=".">새로고침</a>하기</span>
+
     <div id="menubar" class="hide">
       <button id="startbtn">sTart</button>
     </div>
