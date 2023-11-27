@@ -66,10 +66,7 @@ wsServer.on("connection", (ws) => {
   const obj = {
     id: Math.random().toString(),
     name: "",
-    isadmin:
-      [...wsServer.clients].filter(
-        (client) => client.readyState === websocket.OPEN
-      ).length === 1,
+    isadmin: players.length === 0,
     score: Array(11).fill(null),
     isleave: false,
   };
