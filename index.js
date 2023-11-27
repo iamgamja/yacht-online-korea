@@ -118,10 +118,11 @@ wsServer.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    // 방장이 나갔을 때 첫번째 사람 방장으로
+    // 방장이 나갔을 때 나가지 않은 사람 중 첫번째 사람 방장으로
     if (obj.isadmin) {
-      if (players.length) {
-        players[0].isadmin = true;
+      const target = players.findIndex((p) => p.id !== obj.id && !p.isleave);
+      if (target !== -1) {
+        players[target].isadmin = true;
       }
     }
 
