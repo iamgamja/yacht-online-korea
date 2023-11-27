@@ -141,6 +141,9 @@ connection.onmessage = (message) => {
           .children[0].children[idx + 1].classList.add("winner");
       });
 
+      // 이후의 모든 message 무시
+      connection.onmessage = () => {}
+
       break;
     }
 
