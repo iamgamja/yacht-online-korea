@@ -145,6 +145,8 @@ wsServer.on("connection", (ws) => {
 
       senduserupdate();
     }
+
+    tick(); // 방장 업데이트 등을 모두에게 보낸다
   });
 });
 
